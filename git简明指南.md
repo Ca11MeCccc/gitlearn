@@ -1,3 +1,5 @@
+												# 					菜鸟教程上的Git简明指南
+
 **创建新仓库**
 
 ```
@@ -82,6 +84,49 @@ git remote add origin(起什么名字都OK，但是默许的携程origin) <远�
 	git push origin <分支名>
 ```
 
+**如何恢复误删的文件**
+
+```
+1. 查看工作区的变化
+	git status
+2. 知道哪个文件被删除了之后，reset哪个文件
+	git reset <文件名，如果有很多，那就是*>
+3. 取回被误删的文件
+	git cheout <文件名，如果有很多，那就是*>
+```
+
+**更新与合并**
+
+```
+1. 更新本地仓库至最新改动
+	git pull （pull=fetch+merge）
+2. 将其他分支合并到当前分支
+	(通常是将其他分支合并到master分支)
+	git merge <其他分支名>
+	如: git merge shuang11
+
+```
+
+**解决冲突**
+
+```
+在上面的两种情况下，git 都会尝试去自动合并改动。
+	遗憾的是，并非每次都成功，并可能出现冲突（conflicts），即同一行的内容不一样。
+		这时候就需要你修改这些文件来手动解决这些冲突（conflicts），可以使用小乌龟。
+			改完之后，你需要执行如下命令以将它们标记为合并成功：
+			git add <filename>
+		在合并改动之前，你可以使用如下命令预览差异：
+		git diff <A分支> <B分支> (以A分支为基准，B分支发生的变化)
+```
+
+
+
+---
+
+# 							廖雪峰的Git教程
+
+
+
 
 
 
@@ -91,5 +136,7 @@ git remote add origin(起什么名字都OK，但是默许的携程origin) <远�
 1. https://blog.csdn.net/seasermy/article/details/94719709
 
 2. https://www.runoob.com/manual/git-guide/
+
+3. https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424
 ```
 
