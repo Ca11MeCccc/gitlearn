@@ -286,9 +286,15 @@ Git怎么合并呢？
 
 ​	
 
+`git checkout`命令加上`-b`参数表示创建并切换，相当于以下两条命令：
 
+```
+$ git branch dev
+$ git checkout dev
+Switched to branch 'dev
+```
 
-
+111
 
 
 
