@@ -1,3 +1,18 @@
+
+
+```
+参考文档:
+1. https://blog.csdn.net/seasermy/article/details/94719709
+
+2. https://www.runoob.com/manual/git-guide/
+
+3. https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424
+
+4. https://github.com/Ca11MeCccc/learngit/blob/master/2019-10/lmx-Hexagram.md
+```
+
+
+
 												# 					菜鸟教程上的Git简明指南
 
 **创建新仓库**
@@ -320,16 +335,325 @@ Git鼓励大量使用分支：
 删除分支：git branch -d <name>
 ```
 
+分支管理策略
 
+```
+分支策略
+在实际开发中，我们应该按照几个基本原则进行分支管理：
+
+首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+
+那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；
+
+你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。
+
+所以，团队合作的分支看起来就像这样：
+```
+
+![](https://static.liaoxuefeng.com/files/attachments/919023260793600/0)
+
+
+
+
+
+
+
+**需要临时创建一个分支来进行紧急bug的修复，但是目前的工作进度又不能丢**
+
+git stash 
+
+```
+并不是你不想提交，而是工作只进行到一半，还没法提交，预计完成还需1天时间。但是，必须在两个小时内修复该bug，怎么办？
+
+幸好，Git还提供了一个stash功能，可以把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+
+$ git stash
+Saved working directory and index state WIP on dev: f52c633 add merge
+现在，用git status查看工作区，就是干净的（除非有没有被Git管理的文件），因此可以放心地创建分支来修复bug。
+```
+
+
+
+在切换分支并进行相应的操作，然后回到master分支，将原来的分支进行合并，且不想让别人看到自己曾经合并过。
+
+用 git merge --no-ff -m "commit的备注" <将要被合并的分支>
+
+​	--no-ff : 表示不快进模式，no fast forward，就不会保留合并的痕迹了
+
+```
+git merge --no-ff -m "merged bug fix 101" issue-101
+```
+
+
+
+
+
+当我们修复完成之后，需要切换会先前的进度
+
+```
+工作区是干净的，刚才的工作现场存到哪去了？用git stash list命令看看：
+
+$ git stash list
+stash@{0}: WIP on dev: f52c633 add merge
+
+工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：
+
+一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+
+二是用git stash pop，恢复的同时把stash内容也删了：
+
+$ git stash pop
+On branch dev
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   hello.py
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   readme.txt
+
+Dropped refs/stash@{0} (5d677e2ee266f39ea296182fb2354265b91b3b2a)
+再用git stash list查看，就看不到任何stash内容了：
+
+$ git stash list
+你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+
+$ git stash apply stash@{0}
+```
 
 
 
 ```
-参考文档:
-1. https://blog.csdn.net/seasermy/article/details/94719709
+小结
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
 
-2. https://www.runoob.com/manual/git-guide/
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场；
 
-3. https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424
+在master分支上修复的bug，想要合并到当前dev分支，可以用git cherry-pick <commit>命令，把bug提交的修改“复制”到当前分支，避免重复劳动。
 ```
+
+
+
+
+
+
+
+---
+
+# git的知识点小结
+
+1. 部分地方使用了自己的github用户名
+2. git config --global user.name "Hexagram" git config --global user.email "[1471685806@qq.com](mailto:1471685806@qq.com)"
+   - 登记名字和邮箱以使用git
+3. git init 初始化
+4. git status
+5. git diff
+   - git diff HEAD -- *file* 查看*file*在工作区和版本库里最新版本的区别
+6. git add
+7. git commit -m
+8. git log
+9. git reset --hard HEAD^
+   - git reset HEAD *file* 把暂存区的修改退回的工作区
+10. git reflog 记录了使用的每一次命令
+11. git checkout -- *file* 丢弃工作区的修改
+    - 按情况回到**版本库**或者**暂存区**的状态
+    - 实质是使用已存文件替换工作区的版本
+12. git reset HEAD *file*
+13. git rm *file*
+
+> 连接到远程仓库:
+
+1. ssh-keygen -t rsa -C "
+
+   your_email
+
+   "
+
+   - 建立一个本地的ssh公钥和私钥，再把公钥丢到GitHub上
+   - 建立时没有设置密码
+
+2. git remote add origin
+
+    
+
+   git@github.com
+
+   :lmx-Hexagram/ackonwledge_arrangement.git
+
+   - [git@github.com](mailto:git@github.com):用户名/仓库名.git
+
+3. git push -u origin master
+
+   - 第一次使用时需要用-u参数，使其在推送本地master分支的同时，把远程仓库和本地仓库联系起来，以简化以后的命令
+   - git push origin master以后只要这样就可以了
+
+4. git clone
+
+    
+
+   git@github.com
+
+   :lmx-Hexagram/ackonwledge_arrangement.git
+
+   - 从远程仓库克隆
+   - [git@github.com](mailto:git@github.com):用户名/仓库名.git
+   - 也可以使用 git clone https://github.com/lmx-Hexagram/ackonwledge_arrangement.git
+   - 也就是可以使用SSH和https两种协议
+
+> 分支:
+
+1. git checkout -b dev
+
+   - Switched to a new branch 'dev'
+   - 创建并切换到分支'dev'
+   - -b 参数表示创建并切换
+   - 以上语句等价于 git branch dev + git checkout dev
+
+2. git branch 列出所有分支
+
+3. git checkout *branch_name*
+
+4. git merge dev
+
+   - 把dev分支的结果合并到'当前所在'分支上
+   - 此时是使用`Fast-forward`也就是'快进模式',是直接把master指向dev的当前提交
+
+5. git branch -d dev 删除分支
+
+   - git branch **-D** dev 强制删除没有合并过的分支
+
+6. git switch -c dev 创建并切换的新分支dev
+
+   - git switch *branch_name* 切换到已有的分支
+   - **推荐使用switch命令来切换和新建分支**
+
+7. git log --graph 查看分支合并图
+
+8. git merge --no--ff -m "
+
+   say_sth
+
+   "
+
+    
+
+   branch_name
+
+   - 使用`--no--ff`参数使在合并时禁用Fast-forward模式,并创建一个commit
+
+> 暂存工作现场：
+
+1. git stash 保存现在的工作现场(在当前分支)
+2. git stash list
+3. git stash apply 恢复暂存的工作现场
+   - git stash apply stash@{*num*} 使用这种方式指定要恢复的工作现场
+4. git stash drop 删除暂存的工作现场
+5. git stash pop 恢复并删除
+6. git cherry-pick *name_of_commit* 在当前分支重现指定的提交(用来修bug)
+
+> 远程多人合作:
+
+1. git remote -v 查看远程库的信息
+2. git push origin *branch_name* 将本地分支推送到origin
+3. git checkout -b *branch_name* orgin/*branch_name* 在本地创建和远程分支对应的分支，名字一致(不要在这里乱皮)
+4. git branch --set-upstream *branch_name* origin/*branch_name* 建立本地和远程分支的关联
+
+> 标签:
+
+1. git tag命令簇
+
+   - git tag 查看所有标签
+
+   - git tag
+
+      
+
+     tag_name
+
+      
+
+     commit_name
+
+     - for example:
+     - *git tag v1.0 378a2a*
+     - 若没有*commit_name*则默认给当前分支加标签
+
+   - git show *tag_name* 列出此tag的详细信息
+
+   - git tag -a
+
+      
+
+     tag_name
+
+      
+
+     -m "sth_to_say"
+
+      
+
+     commit_name
+
+     - 打上标签并给标签加上说明
+
+   - git tag -d *tag_name* 删除标签
+
+2. git push origin
+
+    
+
+   tag_name
+
+    
+
+   将标签推送到远程
+
+   - git push origin --tags 将本地所有的标签推送到远程
+
+3. git push origin :refs/tags/*tag_name* 删除远程标签(目前不太懂原理,最好先删除本地标签)
+
+> 在github上工作
+
+1. git clone
+
+    
+
+   git@github.com
+
+   :lmx-Hexagram/learngit.git
+
+   - 先在github上把项目folk到自己的库里，再从github上自己的库里把项目clone下来
+   - 在自己本地修改好后，pull到github上自己的库里
+   - 在github的项目中发起pull request
+
+> git的自定义：
+
+1. git config --global color.ui true 显示颜色
+
+2. 忽略特殊文件
+
+   - 在工作区根目录创建`.gitignore`文件
+   - 在https://github.com/github/gitignore中找到要用的配置文件
+   - git add -f *file_name* 强制添加被忽略的文件
+   - git check-ignore -v *file_name* 查看时那一条忽略规则，忽略了该文件
+   - 还有`.gitignore要放在版本库里，换言之不能忽略该文件，这样可以方面以后管理`
+
+3. git config --global alias.
+
+   the_name_as_your_convinent
+
+    
+
+   command_of_git
+
+   - 以这种方式定义别名，下次使用时可以直接`git *the_name_as_your_convinent*`
+   - --global参数使该命令针对这台电脑所有Git仓库有效
+   - *git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"* **神仙用法**
+
+> 以上
+
+​																																	lmx-Hexagram
 
